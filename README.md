@@ -1,4 +1,4 @@
-# Mirage Run
+# Oasis Mirage Run
 
 A polished side-scrolling runner game for Oasis Security. Control a cute camel running through a desert-oasis world. Collect API keys, secrets, and MCP connectors—but watch your overload meter. Too much unmanaged access leads to chaos.
 

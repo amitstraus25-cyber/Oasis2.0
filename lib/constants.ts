@@ -1,5 +1,5 @@
 /**
- * Mirage Run - Black & white Dino style with camel, collectibles, water spit
+ * Oasis Mirage Run - Black & white Dino style with camel, collectibles, water spit
  */
 
 // Game dimensions (bigger)

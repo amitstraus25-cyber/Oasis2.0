@@ -109,7 +109,7 @@ export function StartScreen({ onStart }: StartScreenProps) {
         className="flex items-center gap-4 mb-6"
       >
         <CamelIcon />
-        <h1 className="text-5xl font-bold text-gray-700">Mirage Run</h1>
+        <h1 className="text-5xl font-bold text-gray-700">Oasis Mirage Run</h1>
       </motion.div>
 
       <motion.p

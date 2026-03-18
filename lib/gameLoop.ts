@@ -1,5 +1,5 @@
 /**
- * Mirage Run - Camel runner with collectibles and water spit
+ * Oasis Mirage Run - Camel runner with collectibles and water spit
  */
 
 import type { GameState, ObstacleType, CollectibleType, ExplosionParticle } from "./types";

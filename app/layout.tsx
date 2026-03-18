@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Mirage Run",
+  title: "Oasis Mirage Run",
   description: "Collect API keys, secrets, and MCPs. Dodge the chaos. Don't overload.",
 };
 

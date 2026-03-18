@@ -12,49 +12,41 @@ export function StartScreen({ onStart }: StartScreenProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-b from-sand-100 via-sand-50 to-oasis-100 p-8"
+      className="fixed inset-0 z-20 flex flex-col items-center justify-center bg-white p-8"
     >
       <motion.h1
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="text-6xl md:text-7xl font-bold text-oasis-800 mb-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="text-5xl font-bold text-black mb-6"
       >
         Mirage Run
       </motion.h1>
       <motion.p
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="text-xl text-oasis-700 text-center max-w-xl mb-12"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="text-black mb-4"
       >
-        Collect API keys, secrets, and MCPs. Dodge the chaos. Don&apos;t overload.
+        <kbd className="px-2 py-1 border border-black rounded">Space</kbd> to jump (double jump)
       </motion.p>
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="flex flex-col gap-3 text-oasis-600 mb-12"
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.25 }}
+        className="text-black mb-8"
       >
-        <p className="flex items-center gap-2">
-          <kbd className="px-2 py-1 bg-white/60 rounded shadow-sm">Space</kbd>
-          to jump
-        </p>
-        <p className="flex items-center gap-2">
-          <kbd className="px-2 py-1 bg-white/60 rounded shadow-sm">F</kbd>
-          to spit water
-        </p>
-      </motion.div>
+        <kbd className="px-2 py-1 border border-black rounded">F</kbd> to spit water (collect 5 first)
+      </motion.p>
       <motion.button
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        whileHover={{ scale: 1.05 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
         whileTap={{ scale: 0.98 }}
         onClick={onStart}
-        className="px-12 py-4 rounded-2xl bg-oasis-500 text-white font-semibold text-lg shadow-lg shadow-oasis-500/30 hover:bg-oasis-600 transition-colors"
+        className="px-8 py-3 bg-black text-white font-medium rounded"
       >
-        Start Run
+        Start
       </motion.button>
     </motion.div>
   );

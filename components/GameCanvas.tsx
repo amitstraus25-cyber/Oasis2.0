@@ -14,7 +14,7 @@ import { GAME_WIDTH, GAME_HEIGHT } from "@/lib/constants";
 
 interface GameCanvasProps {
   onStateChange: (state: GameState) => void;
-  onGameOver: (reason: "lives" | "overload") => void;
+  onGameOver: () => void;
   isPlaying: boolean;
 }
 
@@ -64,7 +64,7 @@ export function GameCanvas({
       const delta = now - lastTimeRef.current;
       lastTimeRef.current = now;
 
-      const { state, gameOver, gameOverReason } = updateGameState(
+      const { state, gameOver } = updateGameState(
         stateRef.current,
         delta,
         inputsRef.current
@@ -72,27 +72,22 @@ export function GameCanvas({
 
       inputsRef.current.jump = false;
       inputsRef.current.spit = false;
-
       stateRef.current = state;
       onStateChange(state);
 
-      if (gameOver && gameOverReason) {
-        onGameOver(gameOverReason);
+      if (gameOver) {
+        onGameOver();
         return;
       }
 
       const ctx = canvasRef.current?.getContext("2d");
       if (ctx) {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        drawBackground(ctx, state.elapsedTime * 80, state.overload);
+        drawBackground(ctx);
         state.obstacles.forEach((o) => drawObstacle(ctx, o));
         state.collectibles.forEach((c) => drawCollectible(ctx, c));
         state.projectiles.forEach((p) => drawWaterProjectile(ctx, p));
-        drawCamel(
-          ctx,
-          state.camel,
-          Date.now() < state.invincibleUntil
-        );
+        drawCamel(ctx, state.camel, Date.now() < state.invincibleUntil);
       }
 
       rafRef.current = requestAnimationFrame(loop);
@@ -107,8 +102,8 @@ export function GameCanvas({
       ref={canvasRef}
       width={GAME_WIDTH}
       height={GAME_HEIGHT}
-      className="w-full max-w-full h-auto rounded-lg shadow-xl"
-      style={{ aspectRatio: `${GAME_WIDTH} / ${GAME_HEIGHT}` }}
+      className="block"
+      style={{ imageRendering: "pixelated" }}
     />
   );
 }

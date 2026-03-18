@@ -14,7 +14,6 @@ type GamePhase = "start" | "playing" | "gameover";
 export function GameContainer() {
   const [phase, setPhase] = useState<GamePhase>("start");
   const [gameState, setGameState] = useState<GameState>(() => createInitialState());
-  const [gameOverReason, setGameOverReason] = useState<"lives" | "overload">("lives");
 
   const handleStart = useCallback(() => {
     setGameState(createInitialState());
@@ -25,8 +24,7 @@ export function GameContainer() {
     setGameState(state);
   }, []);
 
-  const handleGameOver = useCallback((reason: "lives" | "overload") => {
-    setGameOverReason(reason);
+  const handleGameOver = useCallback(() => {
     setPhase("gameover");
   }, []);
 
@@ -46,29 +44,34 @@ export function GameContainer() {
   }, [phase, handleStart, handleRestart]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-sand-100 via-sand-50 to-oasis-100">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-white">
       <AnimatePresence mode="wait">
         {phase === "start" && <StartScreen key="start" onStart={handleStart} />}
       </AnimatePresence>
 
       {phase === "playing" && (
-        <div className="relative">
-          <HUD state={gameState} />
-          <GameCanvas
-            onStateChange={handleStateChange}
-            onGameOver={handleGameOver}
-            isPlaying={phase === "playing"}
-          />
+        <div className="flex flex-col items-center">
+          <div className="mb-2 px-4 py-2 bg-gray-100 border border-black text-black text-sm font-mono text-center max-w-[1200px]">
+            <span className="font-bold">Key</span> = API keys authenticate apps.
+            <span className="mx-2">|</span>
+            <span className="font-bold">MCP</span> = Model Context Protocol connections let AI agents access tools.
+            <span className="mx-2">|</span>
+            Collect 5 to unlock water spit!
+          </div>
+          <div className="relative border-2 border-black">
+            <HUD state={gameState} />
+            <GameCanvas
+              onStateChange={handleStateChange}
+              onGameOver={handleGameOver}
+              isPlaying={phase === "playing"}
+            />
+          </div>
         </div>
       )}
 
       <AnimatePresence mode="wait">
         {phase === "gameover" && (
-          <GameOverScreen
-            key="gameover"
-            onRestart={handleRestart}
-            reason={gameOverReason}
-          />
+          <GameOverScreen key="gameover" onRestart={handleRestart} />
         )}
       </AnimatePresence>
     </div>

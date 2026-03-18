@@ -2,15 +2,10 @@
 export type GamePhase = "start" | "playing" | "gameover";
 
 // Collectible types
-export type CollectibleType = "api_key" | "secret" | "mcp_connector";
+export type CollectibleType = "key" | "api_connection";
 
 // Obstacle types
-export type ObstacleType =
-  | "cables"
-  | "token_cactus"
-  | "secret_spikes"
-  | "permission_wall"
-  | "unknown_rock";
+export type ObstacleType = "cactus" | "cactus_small";
 
 // Camel state
 export interface Camel {
@@ -19,8 +14,8 @@ export interface Camel {
   vy: number;
   width: number;
   height: number;
-  scale: number;
   isOnGround: boolean;
+  jumpsUsed: number;
 }
 
 // Obstacle entity
@@ -52,21 +47,19 @@ export interface WaterProjectile {
   height: number;
 }
 
-// Full game state (for HUD and game logic)
+// Full game state
 export interface GameState {
   score: number;
   lives: number;
-  overload: number;
   collectiblesCount: number;
   waterUnlocked: boolean;
-  waterCooldown: number;
-  waterCooldownMax: number;
+  spitsRemaining: number;
   elapsedTime: number;
   lastObstacleSpawn: number;
   lastCollectibleSpawn: number;
+  invincibleUntil: number;
   camel: Camel;
   obstacles: Obstacle[];
   collectibles: Collectible[];
   projectiles: WaterProjectile[];
-  invincibleUntil: number;
 }

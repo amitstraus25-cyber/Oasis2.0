@@ -35,7 +35,9 @@ export const COLLECTIBLE_WIDTH = 32;
 export const COLLECTIBLE_HEIGHT = 32;
 
 // Water spit
-export const COLLECTIBLES_PER_SPIT = 5;
+export const WATER_UNLOCK_COLLECTIBLES = 5;
+export const INITIAL_SPITS = 3;
+export const COLLECTIBLES_PER_EXTRA_SPIT = 3;
 export const WATER_PROJECTILE_SPEED = 18;
 export const WATER_PROJECTILE_WIDTH = 36;
 export const WATER_PROJECTILE_HEIGHT = 18;

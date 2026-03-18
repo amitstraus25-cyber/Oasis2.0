@@ -78,7 +78,7 @@ export function HUD({ state }: HUDProps) {
           </>
         ) : (
           <span className="text-gray-400 text-xs">
-            Collect {5 - state.collectiblesCount} more to unlock
+            Collect {Math.max(0, 5 - state.collectiblesCount)} more to unlock
           </span>
         )}
       </div>

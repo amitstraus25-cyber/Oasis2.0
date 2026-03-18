@@ -19,7 +19,9 @@ import {
   OBSTACLE_SMALL_HEIGHT,
   COLLECTIBLE_WIDTH,
   COLLECTIBLE_HEIGHT,
-  COLLECTIBLES_PER_SPIT,
+  WATER_UNLOCK_COLLECTIBLES,
+  INITIAL_SPITS,
+  COLLECTIBLES_PER_EXTRA_SPIT,
   WATER_PROJECTILE_SPEED,
   WATER_PROJECTILE_WIDTH,
   WATER_PROJECTILE_HEIGHT,
@@ -146,13 +148,16 @@ export function updateGameState(
   newState.elapsedTime += deltaMs / 1000;
   newState.score = Math.floor(newState.elapsedTime * 10) + newState.collectiblesCount * 5;
 
-  // Calculate spits based on collectibles (1 spit per 5 collectibles)
-  const earnedSpits = Math.floor(newState.collectiblesCount / COLLECTIBLES_PER_SPIT);
-  
-  // Water unlocks at first 5 collectibles
-  if (!newState.waterUnlocked && newState.collectiblesCount >= COLLECTIBLES_PER_SPIT) {
+  // Water unlocks at 5 collectibles with 3 initial spits, then +1 per 3 collectibles after
+  if (!newState.waterUnlocked && newState.collectiblesCount >= WATER_UNLOCK_COLLECTIBLES) {
     newState.waterUnlocked = true;
+    newState.spitsRemaining = INITIAL_SPITS;
   }
+  
+  // Calculate total earned spits: 3 initial + 1 for every 3 collectibles after the first 5
+  const extraCollectibles = Math.max(0, newState.collectiblesCount - WATER_UNLOCK_COLLECTIBLES);
+  const extraSpits = Math.floor(extraCollectibles / COLLECTIBLES_PER_EXTRA_SPIT);
+  const totalEarnedSpits = newState.waterUnlocked ? INITIAL_SPITS + extraSpits : 0;
 
   // Camel physics with double jump
   newState.camel = { ...newState.camel };
@@ -178,9 +183,11 @@ export function updateGameState(
     newState.camel.jumpsUsed = 0;
   }
 
-  // Spit water (based on earned spits minus used)
-  const usedSpits = (state.collectiblesCount >= COLLECTIBLES_PER_SPIT ? earnedSpits : 0) - newState.spitsRemaining;
-  newState.spitsRemaining = Math.max(0, earnedSpits - usedSpits);
+  // Track spits used and update remaining (can't exceed total earned)
+  const spitsUsedSoFar = totalEarnedSpits - newState.spitsRemaining;
+  if (newState.spitsRemaining < totalEarnedSpits - spitsUsedSoFar) {
+    newState.spitsRemaining = totalEarnedSpits - spitsUsedSoFar;
+  }
 
   if (inputs.spit && newState.waterUnlocked && newState.spitsRemaining > 0) {
     newState.spitsRemaining--;

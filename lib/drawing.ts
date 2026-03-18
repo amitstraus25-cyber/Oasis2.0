@@ -33,6 +33,7 @@ export function drawCamel(
   ctx.fillStyle = "#000000";
   ctx.save();
   ctx.translate(camel.x, camel.y);
+  ctx.scale(camel.scale, camel.scale);
 
   // Body
   ctx.fillRect(6, 18, 30, 24);

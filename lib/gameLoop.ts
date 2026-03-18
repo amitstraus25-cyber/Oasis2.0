@@ -29,6 +29,8 @@ import {
   MAX_COLLECTIBLE_INTERVAL,
   MAX_LIVES,
   INVINCIBILITY_MS,
+  CAMEL_SCALE_PER_COLLECTIBLE,
+  CAMEL_MAX_SCALE,
 } from "./constants";
 
 const OBSTACLE_TYPES: { type: ObstacleType; w: number; h: number }[] = [
@@ -60,6 +62,7 @@ export function createInitialState(): GameState {
       vy: 0,
       width: CAMEL_WIDTH,
       height: CAMEL_HEIGHT,
+      scale: 1,
       isOnGround: true,
       jumpsUsed: 0,
     },
@@ -193,6 +196,11 @@ export function updateGameState(
       if (newState.waterUnlocked) {
         newState.spitsRemaining++;
       }
+      // Camel grows with each collectible
+      newState.camel.scale = Math.min(
+        newState.camel.scale + CAMEL_SCALE_PER_COLLECTIBLE,
+        CAMEL_MAX_SCALE
+      );
       return false;
     }
     return true;

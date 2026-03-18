@@ -14,6 +14,8 @@ export const JUMP_FORCE = -12;
 export const DOUBLE_JUMP_FORCE = -10;
 export const GRAVITY = 0.8;
 export const GROUND_Y = GAME_HEIGHT - 70;
+export const CAMEL_SCALE_PER_COLLECTIBLE = 0.03;
+export const CAMEL_MAX_SCALE = 1.5;
 
 // Scroll speed
 export const SCROLL_SPEED = 10;

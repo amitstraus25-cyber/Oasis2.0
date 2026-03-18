@@ -14,6 +14,7 @@ export interface Camel {
   vy: number;
   width: number;
   height: number;
+  scale: number;
   isOnGround: boolean;
   jumpsUsed: number;
 }

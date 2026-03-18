@@ -83,7 +83,7 @@ export function GameCanvas({
       const ctx = canvasRef.current?.getContext("2d");
       if (ctx) {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        drawBackground(ctx);
+        drawBackground(ctx, state.elapsedTime * 80);
         state.obstacles.forEach((o) => drawObstacle(ctx, o));
         state.collectibles.forEach((c) => drawCollectible(ctx, c));
         state.projectiles.forEach((p) => drawWaterProjectile(ctx, p));

@@ -51,14 +51,7 @@ export function GameContainer() {
 
       {phase === "playing" && (
         <div className="flex flex-col items-center">
-          <div className="mb-2 px-4 py-2 bg-gray-100 border border-black text-black text-sm font-mono text-center max-w-[1200px]">
-            <span className="font-bold">Key</span> = API keys authenticate apps.
-            <span className="mx-2">|</span>
-            <span className="font-bold">MCP</span> = Model Context Protocol connections let AI agents access tools.
-            <span className="mx-2">|</span>
-            Collect 5 to unlock water spit!
-          </div>
-          <div className="relative border-2 border-black">
+          <div className="relative border-2 border-gray-300 rounded-lg overflow-hidden shadow-lg">
             <HUD state={gameState} />
             <GameCanvas
               onStateChange={handleStateChange}
@@ -71,7 +64,7 @@ export function GameContainer() {
 
       <AnimatePresence mode="wait">
         {phase === "gameover" && (
-          <GameOverScreen key="gameover" onRestart={handleRestart} />
+          <GameOverScreen key="gameover" onRestart={handleRestart} score={gameState.score} />
         )}
       </AnimatePresence>
     </div>

@@ -91,10 +91,10 @@ function aabb(
   return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }
 
-function createExplosionParticles(camelX: number, camelY: number): ExplosionParticle[] {
+function createExplosionParticles(camelX: number, camelY: number, count: number = 20): ExplosionParticle[] {
   const particles: ExplosionParticle[] = [];
-  for (let i = 0; i < 20; i++) {
-    const angle = (Math.PI * 2 * i) / 20 + Math.random() * 0.3;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
     const speed = 8 + Math.random() * 12;
     particles.push({
       id: genId(),
@@ -107,6 +107,33 @@ function createExplosionParticles(camelX: number, camelY: number): ExplosionPart
       rotationSpeed: (Math.random() - 0.5) * 0.3,
     });
   }
+  return particles;
+}
+
+function createHitParticles(camelX: number, camelY: number): ExplosionParticle[] {
+  const particles: ExplosionParticle[] = [];
+  // One key popping out
+  particles.push({
+    id: genId(),
+    type: "key",
+    x: camelX + CAMEL_WIDTH / 2,
+    y: camelY + CAMEL_HEIGHT / 3,
+    vx: 3 + Math.random() * 4,
+    vy: -8 - Math.random() * 4,
+    rotation: Math.random() * Math.PI * 2,
+    rotationSpeed: (Math.random() - 0.5) * 0.4,
+  });
+  // One MCP popping out
+  particles.push({
+    id: genId(),
+    type: "mcp",
+    x: camelX + CAMEL_WIDTH / 2,
+    y: camelY + CAMEL_HEIGHT / 3,
+    vx: -2 - Math.random() * 3,
+    vy: -6 - Math.random() * 5,
+    rotation: Math.random() * Math.PI * 2,
+    rotationSpeed: (Math.random() - 0.5) * 0.4,
+  });
   return particles;
 }
 
@@ -218,6 +245,16 @@ export function updateGameState(
         newState.lives--;
         newState.invincibleUntil = now + INVINCIBILITY_MS;
         newState.obstacles = newState.obstacles.filter((o) => o.id !== obs.id);
+        
+        // Pop out key and MCP if player has collectibles
+        if (newState.collectiblesCount > 0) {
+          const hitParticles = createHitParticles(newState.camel.x, newState.camel.y);
+          newState.explosionParticles = [...newState.explosionParticles, ...hitParticles];
+          // Lose 1 collectible (but not below 0)
+          newState.collectiblesCount = Math.max(0, newState.collectiblesCount - 1);
+          // Shrink camel slightly
+          newState.camel.scale = Math.max(1, newState.camel.scale - CAMEL_SCALE_PER_COLLECTIBLE);
+        }
         break;
       }
     }

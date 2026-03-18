@@ -2,7 +2,7 @@
  * Mirage Run - Camel runner with collectibles and water spit
  */
 
-import type { GameState, ObstacleType, CollectibleType } from "./types";
+import type { GameState, ObstacleType, CollectibleType, ExplosionParticle } from "./types";
 import {
   GAME_WIDTH,
   GROUND_Y,
@@ -19,18 +19,21 @@ import {
   OBSTACLE_SMALL_HEIGHT,
   COLLECTIBLE_WIDTH,
   COLLECTIBLE_HEIGHT,
-  WATER_UNLOCK_COLLECTIBLES,
-  INITIAL_SPITS,
+  COLLECTIBLES_PER_SPIT,
   WATER_PROJECTILE_SPEED,
-  WATER_PROJECTILE_SIZE,
+  WATER_PROJECTILE_WIDTH,
+  WATER_PROJECTILE_HEIGHT,
   MIN_OBSTACLE_INTERVAL,
   MAX_OBSTACLE_INTERVAL,
   MIN_COLLECTIBLE_INTERVAL,
   MAX_COLLECTIBLE_INTERVAL,
+  MIN_HEART_INTERVAL,
+  MAX_HEART_INTERVAL,
   MAX_LIVES,
   INVINCIBILITY_MS,
   CAMEL_SCALE_PER_COLLECTIBLE,
   CAMEL_MAX_SCALE,
+  OVERLOAD_COLLECTIBLES,
 } from "./constants";
 
 const OBSTACLE_TYPES: { type: ObstacleType; w: number; h: number }[] = [
@@ -55,6 +58,7 @@ export function createInitialState(): GameState {
     elapsedTime: 0,
     lastObstacleSpawn: 0,
     lastCollectibleSpawn: 0,
+    lastHeartSpawn: 0,
     invincibleUntil: 0,
     camel: {
       x: CAMEL_X,
@@ -69,6 +73,8 @@ export function createInitialState(): GameState {
     obstacles: [],
     collectibles: [],
     projectiles: [],
+    explosionParticles: [],
+    gameOverReason: undefined,
   };
 }
 
@@ -85,6 +91,25 @@ function aabb(
   return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }
 
+function createExplosionParticles(camelX: number, camelY: number): ExplosionParticle[] {
+  const particles: ExplosionParticle[] = [];
+  for (let i = 0; i < 20; i++) {
+    const angle = (Math.PI * 2 * i) / 20 + Math.random() * 0.3;
+    const speed = 8 + Math.random() * 12;
+    particles.push({
+      id: genId(),
+      type: Math.random() > 0.5 ? "key" : "mcp",
+      x: camelX + CAMEL_WIDTH / 2,
+      y: camelY + CAMEL_HEIGHT / 2,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 5,
+      rotation: Math.random() * Math.PI * 2,
+      rotationSpeed: (Math.random() - 0.5) * 0.3,
+    });
+  }
+  return particles;
+}
+
 export function updateGameState(
   state: GameState,
   deltaMs: number,
@@ -94,10 +119,12 @@ export function updateGameState(
   newState.elapsedTime += deltaMs / 1000;
   newState.score = Math.floor(newState.elapsedTime * 10) + newState.collectiblesCount * 5;
 
-  // Water unlock (grant initial spits)
-  if (!newState.waterUnlocked && newState.collectiblesCount >= WATER_UNLOCK_COLLECTIBLES) {
+  // Calculate spits based on collectibles (1 spit per 5 collectibles)
+  const earnedSpits = Math.floor(newState.collectiblesCount / COLLECTIBLES_PER_SPIT);
+  
+  // Water unlocks at first 5 collectibles
+  if (!newState.waterUnlocked && newState.collectiblesCount >= COLLECTIBLES_PER_SPIT) {
     newState.waterUnlocked = true;
-    newState.spitsRemaining = INITIAL_SPITS;
   }
 
   // Camel physics with double jump
@@ -124,7 +151,10 @@ export function updateGameState(
     newState.camel.jumpsUsed = 0;
   }
 
-  // Spit water (ammo-based)
+  // Spit water (based on earned spits minus used)
+  const usedSpits = (state.collectiblesCount >= COLLECTIBLES_PER_SPIT ? earnedSpits : 0) - newState.spitsRemaining;
+  newState.spitsRemaining = Math.max(0, earnedSpits - usedSpits);
+
   if (inputs.spit && newState.waterUnlocked && newState.spitsRemaining > 0) {
     newState.spitsRemaining--;
     newState.projectiles = [
@@ -132,9 +162,9 @@ export function updateGameState(
       {
         id: genId(),
         x: CAMEL_X + CAMEL_WIDTH,
-        y: newState.camel.y + newState.camel.height / 2 - WATER_PROJECTILE_SIZE / 2,
-        width: WATER_PROJECTILE_SIZE,
-        height: WATER_PROJECTILE_SIZE,
+        y: newState.camel.y + newState.camel.height / 2 - WATER_PROJECTILE_HEIGHT / 2,
+        width: WATER_PROJECTILE_WIDTH,
+        height: WATER_PROJECTILE_HEIGHT,
       },
     ];
   }
@@ -154,6 +184,17 @@ export function updateGameState(
     .map((c) => ({ ...c, x: c.x - SCROLL_SPEED }))
     .filter((c) => c.x > -50);
 
+  // Update explosion particles
+  newState.explosionParticles = newState.explosionParticles
+    .map((p) => ({
+      ...p,
+      x: p.x + p.vx,
+      y: p.y + p.vy,
+      vy: p.vy + 0.4,
+      rotation: p.rotation + p.rotationSpeed,
+    }))
+    .filter((p) => p.y < GROUND_Y + 100);
+
   // Water vs obstacles
   const hitObstacleIds = new Set<string>();
   newState.projectiles = newState.projectiles.filter((proj) => {
@@ -170,10 +211,10 @@ export function updateGameState(
   // Camel vs obstacles (with lives and invincibility)
   const now = Date.now();
   if (now >= newState.invincibleUntil) {
-    const camelLeft = newState.camel.x;
-    const camelTop = newState.camel.y;
+    const camelW = newState.camel.width * newState.camel.scale;
+    const camelH = newState.camel.height * newState.camel.scale;
     for (const obs of newState.obstacles) {
-      if (aabb(camelLeft, camelTop, newState.camel.width, newState.camel.height, obs.x, obs.y, obs.width, obs.height)) {
+      if (aabb(newState.camel.x, newState.camel.y, camelW, camelH, obs.x, obs.y, obs.width, obs.height)) {
         newState.lives--;
         newState.invincibleUntil = now + INVINCIBILITY_MS;
         newState.obstacles = newState.obstacles.filter((o) => o.id !== obs.id);
@@ -182,29 +223,40 @@ export function updateGameState(
     }
   }
 
-  // Check game over
+  // Check game over by lives
   if (newState.lives <= 0) {
+    newState.gameOverReason = "lives";
     return { state: newState, gameOver: true };
   }
 
   // Camel vs collectibles
-  const camelLeft = newState.camel.x;
-  const camelTop = newState.camel.y;
+  const camelW = newState.camel.width * newState.camel.scale;
+  const camelH = newState.camel.height * newState.camel.scale;
   newState.collectibles = newState.collectibles.filter((c) => {
-    if (aabb(camelLeft, camelTop, newState.camel.width, newState.camel.height, c.x, c.y, c.width, c.height)) {
-      newState.collectiblesCount++;
-      if (newState.waterUnlocked) {
-        newState.spitsRemaining++;
+    if (aabb(newState.camel.x, newState.camel.y, camelW, camelH, c.x, c.y, c.width, c.height)) {
+      if (c.type === "heart") {
+        // Heart gives extra life (max 5)
+        newState.lives = Math.min(newState.lives + 1, 5);
+      } else {
+        // Key or MCP
+        newState.collectiblesCount++;
+        // Camel grows with each collectible
+        newState.camel.scale = Math.min(
+          newState.camel.scale + CAMEL_SCALE_PER_COLLECTIBLE,
+          CAMEL_MAX_SCALE
+        );
       }
-      // Camel grows with each collectible
-      newState.camel.scale = Math.min(
-        newState.camel.scale + CAMEL_SCALE_PER_COLLECTIBLE,
-        CAMEL_MAX_SCALE
-      );
       return false;
     }
     return true;
   });
+
+  // Check overload explosion at 30 collectibles
+  if (newState.collectiblesCount >= OVERLOAD_COLLECTIBLES) {
+    newState.explosionParticles = createExplosionParticles(newState.camel.x, newState.camel.y);
+    newState.gameOverReason = "overload";
+    return { state: newState, gameOver: true };
+  }
 
   // Spawn obstacles
   const obsInterval = MIN_OBSTACLE_INTERVAL + Math.random() * (MAX_OBSTACLE_INTERVAL - MIN_OBSTACLE_INTERVAL);
@@ -224,7 +276,7 @@ export function updateGameState(
     ];
   }
 
-  // Spawn collectibles
+  // Spawn collectibles (keys and MCP)
   const colInterval = MIN_COLLECTIBLE_INTERVAL + Math.random() * (MAX_COLLECTIBLE_INTERVAL - MIN_COLLECTIBLE_INTERVAL);
   if (newState.elapsedTime - newState.lastCollectibleSpawn >= colInterval) {
     newState.lastCollectibleSpawn = newState.elapsedTime;
@@ -236,6 +288,23 @@ export function updateGameState(
         type,
         x: GAME_WIDTH + 10,
         y: GROUND_Y - COLLECTIBLE_HEIGHT - Math.random() * 60,
+        width: COLLECTIBLE_WIDTH,
+        height: COLLECTIBLE_HEIGHT,
+      },
+    ];
+  }
+
+  // Spawn hearts (rare)
+  const heartInterval = MIN_HEART_INTERVAL + Math.random() * (MAX_HEART_INTERVAL - MIN_HEART_INTERVAL);
+  if (newState.elapsedTime - newState.lastHeartSpawn >= heartInterval) {
+    newState.lastHeartSpawn = newState.elapsedTime;
+    newState.collectibles = [
+      ...newState.collectibles,
+      {
+        id: genId(),
+        type: "heart",
+        x: GAME_WIDTH + 10,
+        y: GROUND_Y - COLLECTIBLE_HEIGHT - 20 - Math.random() * 40,
         width: COLLECTIBLE_WIDTH,
         height: COLLECTIBLE_HEIGHT,
       },

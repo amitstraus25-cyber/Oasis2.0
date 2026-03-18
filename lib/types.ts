@@ -2,7 +2,10 @@
 export type GamePhase = "start" | "playing" | "gameover";
 
 // Collectible types
-export type CollectibleType = "key" | "api_connection";
+export type CollectibleType = "key" | "api_connection" | "heart";
+
+// Game over reason
+export type GameOverReason = "lives" | "overload";
 
 // Obstacle types
 export type ObstacleType = "cactus" | "cactus_small";
@@ -48,6 +51,18 @@ export interface WaterProjectile {
   height: number;
 }
 
+// Explosion particle (for overload explosion)
+export interface ExplosionParticle {
+  id: string;
+  type: "key" | "mcp";
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  rotation: number;
+  rotationSpeed: number;
+}
+
 // Full game state
 export interface GameState {
   score: number;
@@ -58,9 +73,12 @@ export interface GameState {
   elapsedTime: number;
   lastObstacleSpawn: number;
   lastCollectibleSpawn: number;
+  lastHeartSpawn: number;
   invincibleUntil: number;
   camel: Camel;
   obstacles: Obstacle[];
   collectibles: Collectible[];
   projectiles: WaterProjectile[];
+  explosionParticles: ExplosionParticle[];
+  gameOverReason?: GameOverReason;
 }

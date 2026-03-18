@@ -46,9 +46,9 @@ export function HUD({ state }: HUDProps) {
           <span className="text-gray-700 font-bold">{state.collectiblesCount}</span>
         </div>
 
-        {/* Lives */}
+        {/* Lives (up to 5 max) */}
         <div className="flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
-          {Array.from({ length: 3 }).map((_, i) => (
+          {Array.from({ length: Math.max(3, state.lives) }).map((_, i) => (
             <span
               key={i}
               className={`text-lg ${i < state.lives ? "text-red-500" : "text-gray-300"}`}
@@ -57,6 +57,15 @@ export function HUD({ state }: HUDProps) {
             </span>
           ))}
         </div>
+
+        {/* Overload warning */}
+        {state.collectiblesCount >= 20 && (
+          <div className="flex items-center gap-2 bg-red-100 px-3 py-1.5 rounded-lg border border-red-300 animate-pulse">
+            <span className="text-red-600 font-bold text-xs">
+              OVERLOAD: {state.collectiblesCount}/30
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Water spit */}

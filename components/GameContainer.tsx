@@ -64,7 +64,13 @@ export function GameContainer() {
 
       <AnimatePresence mode="wait">
         {phase === "gameover" && (
-          <GameOverScreen key="gameover" onRestart={handleRestart} score={gameState.score} />
+          <GameOverScreen
+            key="gameover"
+            onRestart={handleRestart}
+            score={gameState.score}
+            collectibles={gameState.collectiblesCount}
+            reason={gameState.gameOverReason}
+          />
         )}
       </AnimatePresence>
     </div>

@@ -3,7 +3,7 @@
  * Polished camel, cactus, collectibles (key, MCP), water spit
  */
 
-import type { Camel, Obstacle, Collectible, WaterProjectile } from "./types";
+import type { Camel, Obstacle, Collectible, WaterProjectile, ExplosionParticle } from "./types";
 import type { ObstacleType, CollectibleType } from "./types";
 import { GAME_WIDTH, GAME_HEIGHT, GROUND_Y } from "./constants";
 
@@ -168,7 +168,7 @@ export function drawCollectible(
     // Key teeth
     ctx.fillRect(24, 8, 3, 8);
     ctx.fillRect(28, 8, 3, 6);
-  } else {
+  } else if (c.type === "api_connection") {
     // MCP connector - circuit-like design
     ctx.fillStyle = "#535353";
     ctx.strokeStyle = "#535353";
@@ -199,31 +199,96 @@ export function drawCollectible(
     ctx.fillRect(14, 26, 4, 6);
     ctx.fillRect(0, 14, 6, 4);
     ctx.fillRect(26, 14, 6, 4);
+  } else if (c.type === "heart") {
+    // Heart collectible - red/pink
+    ctx.fillStyle = "#e74c3c";
+
+    ctx.beginPath();
+    ctx.moveTo(16, 28);
+    ctx.bezierCurveTo(4, 18, 4, 8, 10, 6);
+    ctx.bezierCurveTo(14, 4, 16, 8, 16, 10);
+    ctx.bezierCurveTo(16, 8, 18, 4, 22, 6);
+    ctx.bezierCurveTo(28, 8, 28, 18, 16, 28);
+    ctx.fill();
+
+    // Highlight
+    ctx.fillStyle = "#ffffff";
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath();
+    ctx.ellipse(10, 10, 3, 4, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
   }
 
   ctx.restore();
 }
 
-// Improved water spit (droplet shape)
+// Water spit (elongated horizontal droplet)
 export function drawWaterProjectile(ctx: CanvasRenderingContext2D, p: WaterProjectile) {
   ctx.fillStyle = "#535353";
   ctx.save();
   ctx.translate(p.x, p.y);
 
-  // Droplet shape
+  // Elongated horizontal droplet shape (pointed at front)
   ctx.beginPath();
   ctx.moveTo(p.width, p.height / 2);
-  ctx.quadraticCurveTo(p.width * 0.8, 0, p.width / 2, 0);
-  ctx.quadraticCurveTo(0, 0, 0, p.height / 2);
-  ctx.quadraticCurveTo(0, p.height, p.width / 2, p.height);
-  ctx.quadraticCurveTo(p.width * 0.8, p.height, p.width, p.height / 2);
+  ctx.quadraticCurveTo(p.width * 0.7, 0, p.width * 0.3, 0);
+  ctx.quadraticCurveTo(0, p.height * 0.2, 0, p.height / 2);
+  ctx.quadraticCurveTo(0, p.height * 0.8, p.width * 0.3, p.height);
+  ctx.quadraticCurveTo(p.width * 0.7, p.height, p.width, p.height / 2);
   ctx.fill();
 
-  // Highlight
+  // Highlight streaks
   ctx.fillStyle = "#ffffff";
   ctx.beginPath();
-  ctx.arc(p.width * 0.35, p.height * 0.35, 3, 0, Math.PI * 2);
+  ctx.ellipse(p.width * 0.25, p.height * 0.35, 4, 2, 0, 0, Math.PI * 2);
   ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(p.width * 0.45, p.height * 0.4, 3, 1.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+// Explosion particle (key or MCP flying)
+export function drawExplosionParticle(ctx: CanvasRenderingContext2D, p: ExplosionParticle) {
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.rotate(p.rotation);
+  ctx.globalAlpha = 0.8;
+
+  if (p.type === "key") {
+    // Mini key
+    ctx.fillStyle = "#535353";
+    ctx.beginPath();
+    ctx.arc(0, 0, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#535353";
+    ctx.fillRect(4, -2, 10, 3);
+    ctx.fillRect(10, -2, 2, 6);
+  } else {
+    // Mini MCP
+    ctx.fillStyle = "#535353";
+    ctx.strokeStyle = "#535353";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(-8, -8, 16, 16, 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.roundRect(-5, -5, 10, 10, 1);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(-2, -2, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(2, 2, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   ctx.restore();
 }

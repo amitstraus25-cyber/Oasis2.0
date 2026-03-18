@@ -35,13 +35,20 @@ export const COLLECTIBLE_WIDTH = 32;
 export const COLLECTIBLE_HEIGHT = 32;
 
 // Water spit
-export const WATER_UNLOCK_COLLECTIBLES = 5;
-export const INITIAL_SPITS = 3;
+export const COLLECTIBLES_PER_SPIT = 5;
 export const WATER_PROJECTILE_SPEED = 18;
-export const WATER_PROJECTILE_SIZE = 20;
+export const WATER_PROJECTILE_WIDTH = 36;
+export const WATER_PROJECTILE_HEIGHT = 18;
+
+// Overload explosion
+export const OVERLOAD_COLLECTIBLES = 30;
 
 // Spawn
 export const MIN_OBSTACLE_INTERVAL = 1.0;
 export const MAX_OBSTACLE_INTERVAL = 2.2;
 export const MIN_COLLECTIBLE_INTERVAL = 1.5;
 export const MAX_COLLECTIBLE_INTERVAL = 3.0;
+
+// Heart spawn (rare)
+export const MIN_HEART_INTERVAL = 25;
+export const MAX_HEART_INTERVAL = 45;

@@ -9,6 +9,7 @@ import {
   drawObstacle,
   drawCollectible,
   drawWaterProjectile,
+  drawExplosionParticle,
 } from "@/lib/drawing";
 import { GAME_WIDTH, GAME_HEIGHT } from "@/lib/constants";
 
@@ -87,6 +88,7 @@ export function GameCanvas({
         state.obstacles.forEach((o) => drawObstacle(ctx, o));
         state.collectibles.forEach((c) => drawCollectible(ctx, c));
         state.projectiles.forEach((p) => drawWaterProjectile(ctx, p));
+        state.explosionParticles.forEach((p) => drawExplosionParticle(ctx, p));
         drawCamel(ctx, state.camel, Date.now() < state.invincibleUntil);
       }
 

@@ -3,14 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0a0f;
-  --foreground: #e4e4e7;
-  --neon-cyan: #00f5ff;
-  --neon-magenta: #ff00ff;
-  --card-bg: #1a1a2e;
+  --sand-50: #fdf8f3;
+  --sand-100: #f5ede4;
+  --sand-200: #e8d5b7;
+  --sand-300: #d4a574;
+  --oasis-teal: #0d9488;
+  --oasis-blue: #0ea5e9;
+  --oasis-500: #14b8a6;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #fdf8f3 0%, #e8d5b7 50%, #ccfbf1 100%);
 }

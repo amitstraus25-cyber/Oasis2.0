@@ -1,6 +1,6 @@
-# Memory Match
+# Mirage Run
 
-A simple memory card flip game where you match pairs. Dark theme with neon cyan and magenta accents.
+A polished side-scrolling runner game for Oasis Security. Control a cute camel running through a desert-oasis world. Collect API keys, secrets, and MCP connectors—but watch your overload meter. Too much unmanaged access leads to chaos.
 
 ## Tech Stack
 
@@ -9,6 +9,12 @@ A simple memory card flip game where you match pairs. Dark theme with neon cyan 
 - Tailwind CSS
 - React 18
 - Framer Motion
+
+## Controls
+
+- **Space** – Jump
+- **F** – Spit water (unlocks after collecting 7 items)
+- **Enter** – Start / Restart
 
 ## Local Development
 

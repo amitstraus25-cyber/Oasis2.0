@@ -10,9 +10,9 @@ export const GAME_HEIGHT = 450;
 export const CAMEL_X = 100;
 export const CAMEL_WIDTH = 55;
 export const CAMEL_HEIGHT = 60;
-export const JUMP_FORCE = -16;
-export const DOUBLE_JUMP_FORCE = -13;
-export const GRAVITY = 0.65;
+export const JUMP_FORCE = -12;
+export const DOUBLE_JUMP_FORCE = -10;
+export const GRAVITY = 0.8;
 export const GROUND_Y = GAME_HEIGHT - 70;
 
 // Scroll speed
